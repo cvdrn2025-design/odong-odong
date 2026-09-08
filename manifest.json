@@ -35,22 +35,6 @@
       "purpose": "maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "screenshot-mobile.png",
-      "sizes": "360x640",
-      "type": "image/png",
-      "platform": "narrow",
-      "label": "Halaman Utama Odong-Odong"
-    },
-    {
-      "src": "screenshot-desktop.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "platform": "wide",
-      "label": "Dashboard Odong-Odong"
-    }
-  ],
   "shortcuts": [
     {
       "name": "Admin Panel",
@@ -77,23 +61,6 @@
           "type": "image/png"
         }
       ]
-    }
-  ],
-  "share_target": {
-    "action": "/index.html",
-    "method": "GET",
-    "enctype": "application/x-www-form-urlencoded",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  },
-  "prefer_related_applications": false,
-  "related_applications": [
-    {
-      "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=com.cvdrn.odongodong"
     }
   ]
 }

@@ -1,36 +1,48 @@
 {
-  "name": "Odong-Odong Samarinda",
-  "short_name": "Odong-Odong",
-  "description": "Aplikasi timer dan manajemen omzet untuk odong-odong",
+  "name": "Odong-Odong",
+  "short_name": "Odong",
+  "description": "Aplikasi timer odong-odong",
   "start_url": "/index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0f172a",
   "theme_color": "#facc15",
+  "id": "/",
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot.png",
+      "sizes": "360x640",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Halaman Utama"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Admin",
+      "url": "/admin.html",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "categories": ["business"]
 }

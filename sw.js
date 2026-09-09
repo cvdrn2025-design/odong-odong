@@ -4,12 +4,12 @@
 
 const CACHE_NAME = 'odong-odong-v1.0.2';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/admin.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
+  '/odong-odong/',
+  '/odong-odong/index.html',
+  '/odong-odong/admin.html',
+  '/odong-odong/manifest.json',
+  '/odong-odong/icon-192.png',
+  '/odong-odong/icon-512.png'
 ];
 
 // ============================================
@@ -56,7 +56,7 @@ self.addEventListener('activate', (event) => {
 });
 
 // ============================================
-// FETCH EVENT - Serve from cache or network
+// FETCH EVENT
 // ============================================
 self.addEventListener('fetch', (event) => {
   const request = event.request;
@@ -68,7 +68,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // HTML pages - Network first, fallback to cache
+  // HTML pages - Network first
   if (request.headers.get('accept')?.includes('text/html')) {
     event.respondWith(
       fetch(request)
@@ -83,14 +83,14 @@ self.addEventListener('fetch', (event) => {
           return caches.match(request)
             .then((cachedResponse) => {
               if (cachedResponse) return cachedResponse;
-              return caches.match('/index.html');
+              return caches.match('/odong-odong/index.html');
             });
         })
     );
     return;
   }
 
-  // Assets - Cache first, fallback to network
+  // Assets - Cache first
   if (request.url.match(/\.(css|js|json|png|jpg|jpeg|svg|webp|ico)$/)) {
     event.respondWith(
       caches.match(request)
@@ -113,7 +113,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Default - Network first
+  // Default
   event.respondWith(
     fetch(request)
       .catch(() => {
@@ -128,11 +128,11 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('push', (event) => {
   const options = {
     body: event.data ? event.data.text() : 'Ada pembaruan!',
-    icon: '/icon-192.png',
-    badge: '/icon-192.png',
+    icon: '/odong-odong/icon-192.png',
+    badge: '/odong-odong/icon-192.png',
     vibrate: [200, 100, 200],
     data: {
-      url: '/'
+      url: '/odong-odong/'
     }
   };
 
@@ -146,7 +146,7 @@ self.addEventListener('push', (event) => {
 // ============================================
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const urlToOpen = event.notification.data?.url || '/';
+  const urlToOpen = event.notification.data?.url || '/odong-odong/';
 
   event.waitUntil(
     self.clients.matchAll({
@@ -154,7 +154,7 @@ self.addEventListener('notificationclick', (event) => {
       includeUncontrolled: true
     }).then((clientList) => {
       for (const client of clientList) {
-        if (client.url === urlToOpen && 'focus' in client) {
+        if (client.url.includes(urlToOpen) && 'focus' in client) {
           return client.focus();
         }
       }

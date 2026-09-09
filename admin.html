@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel · Odong-Odong</title>
+
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="https://cvdrn2025-design.github.io/odong-odong/manifest.json" />
+    <meta name="theme-color" content="#facc15" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+    <style>
+        /* ========================================
+                   RESET & BASE
+                ======================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #0f172a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .admin-container {
+            max-width: 700px;
+            width: 100%;
+            background: #0b1120;
+            border-radius: 40px;
+            padding: 32px 28px;
+            border: 1px solid #2d3a52;
+            box-shadow: 0 25px 50px -8px rgba(0, 0, 0, 0.8);
+        }
+
+        /* ========================================
+                   HEADER
+                ======================================== */
+        .admin-header {
+            text-align: center;
+            margin-bottom: 28px;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 20px;
+        }
+
+        .admin-header h1 {
+            font-weight: 700;
+            font-size: 2rem;
+            background: linear-gradient(to right, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .admin-header h1 small {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #94a3b8;
+            background: #1e293b;
+            padding: 2px 14px;
+            border-radius: 40px;
+        }
+
+        .admin-header .subtitle {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        /* ========================================
+                   STATUS BOX
+                ======================================== */
+        .status-box {
+            background: #1e293b;
+            border-radius: 20px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            border: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .status-box .label {
+            color: #94a3b8;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .status-box .value {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .status-box .value.active {
+            color: #4ade80;
+        }
+
+        .status-box .value.inactive {
+            color: #f87171;
+        }
+
+        .status-box .value.expired {
+            color: #facc15;
+        }
+
+        /* ========================================
+                   FORM
+                ======================================== */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #cbd5e1;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 40px;
+            padding: 12px 18px;
+            color: #f8fafc;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: #facc15;
+        }
+
+        .form-group input::placeholder {
+            color: #475569;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* ========================================
+                   BUTTONS
+                ======================================== */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: #facc15;
+            color: #0f172a;
+            border: 1px solid #fbbf24;
+        }
+        .btn-primary:hover {
+            background: #fde047;
+        }
+
+        .btn-success {
+            background: #16a34a;
+            color: white;
+            border: 1px solid #15803d;
+        }
+        .btn-success:hover {
+            background: #22c55e;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+            border: 1px solid #b91c1c;
+        }
+        .btn-danger:hover {
+            background: #ef4444;
+        }
+
+        .btn-warning {
+            background: #ca8a04;
+            color: white;
+            border: 1px solid #a16207;
+        }
+        .btn-warning:hover {
+            background: #eab308;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #94a3b8;
+            border: 1px solid #334155;
+        }
+        .btn-outline:hover {
+            background: #1e293b;
+            border-color: #475569;
+        }
+
+        .btn-secondary {
+            background: #475569;
+            color: white;
+            border: 1px solid #334155;
+        }
+        .btn-secondary:hover {
+            background: #64748b;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        /* ========================================
+                   USER MANAGEMENT
+                ======================================== */
+        .user-section {
+            background: #1e293b;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 24px;
+            border: 1px solid #334155;
+        }
+
+        .user-section h3 {
+            color: #facc15;
+            margin-bottom: 12px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-list {
+            margin-bottom: 16px;
+        }
+
+        .user-item {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #334155;
+        }
+
+        .user-item .user-info {
+            flex: 1;
+        }
+
+        .user-item .user-name {
+            color: #e2e8f0;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-item .user-details {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            margin-top: 2px;
+        }
+
+        .user-item .user-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .user-item .btn-small {
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: 0.15s;
+            font-weight: 600;
+        }
+
+        .btn-edit {
+            background: #2563eb;
+            color: white;
+        }
+        .btn-edit:hover {
+            background: #3b82f6;
+        }
+
+        .btn-delete {
+            background: #dc2626;
+            color: white;
+        }
+        .btn-delete:hover {
+            background: #ef4444;
+        }
+
+        .user-form {
+            display: grid;
+            gap: 10px;
+        }
+
+        .user-form .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
+        }
+
+        .user-form input {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #f8fafc;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .user-form input:focus {
+            border-color: #facc15;
+        }
+
+        /* ========================================
+                   DIVIDER & INFO
+                ======================================== */
+        .divider {
+            border: none;
+            border-top: 1px solid #1e293b;
+            margin: 20px 0;
+        }
+
+        .info-text {
+            color: #64748b;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .info-text strong {
+            color: #94a3b8;
+        }
+
+        /* ========================================
+                   ALERT
+                ======================================== */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #16a34a20;
+            border: 1px solid #16a34a60;
+            color: #4ade80;
+        }
+
+        .alert-danger {
+            background: #dc262620;
+            border: 1px solid #dc262660;
+            color: #f87171;
+        }
+
+        .alert-warning {
+            background: #facc1520;
+            border: 1px solid #facc1560;
+            color: #facc15;
+        }
+
+        /* ========================================
+                   PIN DISPLAY
+                ======================================== */
+        .pin-display {
+            background: #0f172a;
+            border-radius: 20px;
+            padding: 12px 16px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #facc15;
+            letter-spacing: 8px;
+            border: 2px dashed #334155;
+            margin: 10px 0 16px;
+            user-select: all;
+        }
+
+        .pin-display span {
+            background: #1e293b;
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+
+        /* ========================================
+                   LOG
+                ======================================== */
+        #logList {
+            background: #0f172a;
+            border-radius: 16px;
+            padding: 12px 16px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #1e293b;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            font-family: monospace;
+        }
+
+        #logList div {
+            padding: 4px 0;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        #logList div:last-child {
+            border-bottom: none;
+        }
+
+        /* ========================================
+                   RESPONSIVE
+                ======================================== */
+        @media (max-width: 500px) {
+            .admin-container {
+                padding: 20px 16px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .btn-group .btn {
+                min-width: 80px;
+                font-size: 0.85rem;
+                padding: 10px 14px;
+            }
+            .admin-header h1 {
+                font-size: 1.5rem;
+            }
+            .pin-display {
+                font-size: 1.4rem;
+                letter-spacing: 4px;
+            }
+            .user-form .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <!-- HEADER -->
+        <div class="admin-header">
+            <h1>🔐 Admin Panel <small>Odong-Odong</small></h1>
+            <div class="subtitle">Kelola akses langganan berbayar · Firebase</div>
+        </div>
+
+        <!-- ALERT -->
+        <div id="alertBox" class="alert"></div>
+
+        <!-- STATUS KONEKSI -->
+        <div class="status-box" style="border-color: #facc1550;">
+            <span class="label">📡 Koneksi</span>
+            <span class="value" id="connectionStatus" style="color: #94a3b8;">Menyambung...</span>
+        </div>
+
+        <!-- STATUS LANGANAN -->
+        <div class="status-box">
+            <span class="label">📅 Status Langganan</span>
+            <span class="value" id="statusValue">Memuat...</span>
+        </div>
+
+        <!-- PIN SAAT INI -->
+        <div class="form-group">
+            <label>🔑 PIN Akses Saat Ini</label>
+            <div class="pin-display"><span id="pinValue">----</span></div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- ========================================
+             MANAJEMEN USER (MULTIPLE USERS)
+        ======================================== -->
+        <div class="user-section">
+            <h3>👥 Manajemen Pengguna</h3>
+            
+            <!-- Daftar User -->
+            <div id="userList" class="user-list"></div>
+            
+            <!-- Form Tambah/Edit User -->
+            <div class="user-form">
+                <div class="form-row">
+                    <input type="text" id="namaUserInput" placeholder="Nama User" />
+                    <input type="password" id="pinUserInput" maxlength="6" placeholder="PIN 6 digit" />
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-success" id="tambahUserBtn">➕ Tambah User</button>
+                    <button class="btn btn-warning" id="editUserBtn" style="display:none;">💾 Simpan</button>
+                    <button class="btn btn-danger" id="hapusUserBtn" style="display:none;">🗑️ Hapus</button>
+                </div>
+                <button class="btn btn-outline" id="batalEditBtn" style="display:none;">✕ Batal</button>
+            </div>
+            <div class="info-text">Setiap user dapat memiliki PIN dan masa aktif sendiri.</div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- GENERATE PIN -->
+        <div class="form-group">
+            <label>🔄 Generate PIN Baru</label>
+            <div class="form-row">
+                <button class="btn btn-primary" id="generatePinBtn">🎲 Generate PIN</button>
+                <button class="btn btn-success" id="aktifkanPinBtn">✅ Aktifkan PIN</button>
+            </div>
+            <div class="info-text">PIN baru akan otomatis terisi di atas. Klik "Aktifkan PIN" untuk mengaktifkannya.</div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- SET DURASI -->
+        <div class="form-group">
+            <label>📆 Atur Masa Aktif Langganan</label>
+            <div class="form-row">
+                <input type="number" id="durasiInput" min="1" max="365" value="30" placeholder="Hari" />
+                <button class="btn btn-secondary" id="setDurasiBtn">⏱️ Set Durasi</button>
+            </div>
+            <div class="info-text">Durasi aktif sejak PIN diaktifkan. Default: 30 hari.</div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- TOMBOL AKSI -->
+        <div class="btn-group">
+            <button class="btn btn-danger" id="nonaktifkanBtn">⛔ Nonaktifkan</button>
+            <button class="btn btn-outline" id="resetAllBtn">🔄 Reset Semua</button>
+            <button class="btn btn-outline" id="lihatLogBtn">📋 Lihat Log</button>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- LOG -->
+        <div id="logContainer" style="display: none; margin-top: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <label style="color: #cbd5e1; font-weight: 500; font-size: 0.9rem;">📋 Log Aktivitas</label>
+                <button class="btn btn-outline" id="tutupLogBtn" style="padding: 4px 12px; font-size: 0.7rem; width: auto;">✕ Tutup</button>
+            </div>
+            <div id="logList"></div>
+        </div>
+
+        <div class="info-text" style="margin-top: 16px;">
+            <strong>⚠️ Perhatian:</strong> Data disimpan di Firebase Realtime Database.
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // FIREBASE CONFIG (SAMA DENGAN INDEX.HTML)
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDSH5uW4zNRt-tjwS99bTMc6cb_LV30pYQ",
+            authDomain: "odongonline.firebaseapp.com",
+            databaseURL: "https://odongonline-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "odongonline",
+            storageBucket: "odongonline.firebasestorage.app",
+            messagingSenderId: "300816877292",
+            appId: "1:300816877292:web:b93fa25279bc13a3f5c7c9"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // ==========================================
+        // DOM REFS
+        // ==========================================
+        const $ = (id) => document.getElementById(id);
+        const statusValue = $('statusValue');
+        const pinValue = $('pinValue');
+        const alertBox = $('alertBox');
+        const connectionStatus = $('connectionStatus');
+        const generatePinBtn = $('generatePinBtn');
+        const aktifkanPinBtn = $('aktifkanPinBtn');
+        const setDurasiBtn = $('setDurasiBtn');
+        const durasiInput = $('durasiInput');
+        const nonaktifkanBtn = $('nonaktifkanBtn');
+        const resetAllBtn = $('resetAllBtn');
+        const lihatLogBtn = $('lihatLogBtn');
+        const tutupLogBtn = $('tutupLogBtn');
+        const logContainer = $('logContainer');
+        const logList = $('logList');
+        const userList = $('userList');
+        const namaUserInput = $('namaUserInput');
+        const pinUserInput = $('pinUserInput');
+        const tambahUserBtn = $('tambahUserBtn');
+        const editUserBtn = $('editUserBtn');
+        const hapusUserBtn = $('hapusUserBtn');
+        const batalEditBtn = $('batalEditBtn');
+
+        // ==========================================
+        // KONFIGURASI
+        // ==========================================
+        const PIN_LENGTH = 6;
+        const ADMIN_PATH = 'admin';
+
+        // ==========================================
+        // STATE
+        // ==========================================
+        let adminData = {
+            users: {},
+            pin: null,
+            pinGenerated: null,
+            tanggalAktif: null,
+            tanggalKadaluarsa: null,
+            durasiHari: 30,
+            log: []
+        };
+        let isConnected = false;
+        let selectedUserId = null;
+
+        // ==========================================
+        // FUNGSI UTILITY
+        // ==========================================
+        function generateRandomPin(length = PIN_LENGTH) {
+            let pin = '';
+            for (let i = 0; i < length; i++) {
+                pin += Math.floor(Math.random() * 10);
+            }
+            return pin;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const d = new Date(dateString);
+            return d.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function getTodayISO() {
+            return new Date().toISOString();
+        }
+
+        function getStatusInfo(data) {
+            if (!data || (!data.users && !data.pin)) {
+                return { status: 'inactive', text: '❌ Tidak Aktif', detail: 'Belum ada user aktif' };
+            }
+            
+            // Cek multiple users
+            if (data.users) {
+                const activeUsers = Object.values(data.users).filter(u => {
+                    if (!u.tanggalKadaluarsa) return true;
+                    return new Date() < new Date(u.tanggalKadaluarsa);
+                });
+                return { 
+                    status: activeUsers.length > 0 ? 'active' : 'inactive', 
+                    text: activeUsers.length > 0 ? '✅ Aktif' : '❌ Tidak Aktif', 
+                    detail: `${activeUsers.length} user aktif` 
+                };
+            }
+            
+            // Fallback ke single PIN (legacy)
+            if (!data.tanggalKadaluarsa) {
+                return { status: 'active', text: '✅ Aktif (Tanpa Batas)', detail: 'PIN: ' + data.pin };
+            }
+            const now = new Date();
+            const expired = new Date(data.tanggalKadaluarsa);
+            if (now > expired) {
+                return { status: 'expired', text: '⏰ Kadaluarsa!', detail: 'Kadaluarsa: ' + formatDate(data.tanggalKadaluarsa) };
+            }
+            const diff = Math.ceil((expired - now) / (1000 * 60 * 60 * 24));
+            return { status: 'active', text: '✅ Aktif', detail: 'Sisa ' + diff + ' hari (PIN: ' + data.pin + ')' };
+        }
+
+        function updateStatusDisplay(data) {
+            const info = getStatusInfo(data);
+            statusValue.textContent = info.text + ' · ' + info.detail;
+            statusValue.className = 'value ' + info.status;
+        }
+
+        function updatePinDisplay(data) {
+            if (data && data.users && Object.keys(data.users).length > 0) {
+                const users = Object.values(data.users);
+                pinValue.textContent = users.length + ' user aktif';
+            } else if (data && data.pin) {
+                pinValue.textContent = data.pin;
+            } else if (data && data.pinGenerated) {
+                pinValue.textContent = data.pinGenerated + ' (belum aktif)';
+            } else {
+                pinValue.textContent = '----';
+            }
+        }
+
+        function showAlert(message, type = 'success', duration = 4000) {
+            alertBox.textContent = message;
+            alertBox.className = 'alert show alert-' + type;
+            clearTimeout(alertBox._timeout);
+            alertBox._timeout = setTimeout(() => {
+                alertBox.classList.remove('show');
+            }, duration);
+        }
+
+        function addLog(activity) {
+            const entry = { waktu: getTodayISO(), aktivitas: activity };
+            adminData.log.unshift(entry);
+            if (adminData.log.length > 100) adminData.log.pop();
+            saveData();
+            renderLog();
+        }
+
+        function renderLog() {
+            if (logContainer.style.display === 'none') return;
+            logList.innerHTML = '';
+            if (!adminData.log || adminData.log.length === 0) {
+                logList.innerHTML = '<div style="color: #475569; text-align: center; padding: 12px;">Belum ada aktivitas</div>';
+                return;
+            }
+            adminData.log.forEach(entry => {
+                const div = document.createElement('div');
+                div.innerHTML = `<span style="color: #64748b;">${formatDate(entry.waktu)}</span> — ${entry.aktivitas}`;
+                logList.appendChild(div);
+            });
+        }
+
+        // ==========================================
+        // USER MANAGEMENT FUNCTIONS
+        // ==========================================
+        function renderUserList() {
+            userList.innerHTML = '';
+            
+            if (!adminData.users || Object.keys(adminData.users).length === 0) {
+                userList.innerHTML = '<div style="color: #64748b; padding: 12px; text-align: center;">Belum ada user. Tambahkan user baru di bawah.</div>';
+                return;
+            }
+            
+            Object.entries(adminData.users).forEach(([id, user]) => {
+                const div = document.createElement('div');
+                div.className = 'user-item';
+                
+                const info = document.createElement('div');
+                info.className = 'user-info';
+                
+                const name = document.createElement('div');
+                name.className = 'user-name';
+                name.textContent = user.nama;
+                
+                const details = document.createElement('div');
+                details.className = 'user-details';
+                
+                // Status kadaluarsa
+                let statusText = user.status === 'active' ? '✅ Aktif' : '❌ Nonaktif';
+                if (user.tanggalKadaluarsa) {
+                    const expired = new Date(user.tanggalKadaluarsa);
+                    if (new Date() > expired) {
+                        statusText = '⏰ Kadaluarsa';
+                    } else {
+                        const diff = Math.ceil((expired - new Date()) / (1000 * 60 * 60 * 24));
+                        statusText = `✅ ${diff} hari tersisa`;
+                    }
+                }
+                
+                details.innerHTML = `PIN: ${user.pin} · ${statusText}`;
+                
+                info.append(name, details);
+                
+                const actions = document.createElement('div');
+                actions.className = 'user-actions';
+                
+                const editBtn = document.createElement('button');
+                editBtn.className = 'btn-small btn-edit';
+                editBtn.textContent = '✏️ Edit';
+                editBtn.onclick = () => editUser(id);
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn-small btn-delete';
+                deleteBtn.textContent = '🗑️';
+                deleteBtn.onclick = () => deleteUser(id);
+                
+                actions.append(editBtn, deleteBtn);
+                
+                div.append(info, actions);
+                userList.appendChild(div);
+            });
+        }
+
+        function tambahUser() {
+            const nama = namaUserInput.value.trim();
+            const pin = pinUserInput.value.trim();
+            
+            if (!nama || !pin || pin.length !== 6) {
+                showAlert('Nama dan PIN 6 digit wajib diisi!', 'danger');
+                return;
+            }
+            
+            // Cek PIN duplikat
+            const existingUsers = Object.values(adminData.users);
+            if (existingUsers.some(u => u.pin === pin)) {
+                showAlert('PIN sudah digunakan oleh user lain!', 'danger');
+                return;
+            }
+            
+            if (!adminData.users) adminData.users = {};
+            
+            // Generate unique ID
+            const id = 'user_' + Date.now();
+            adminData.users[id] = {
+                nama: nama,
+                pin: pin,
+                tanggalAktif: getTodayISO(),
+                tanggalKadaluarsa: null, // Unlimited by default
+                status: 'active'
+            };
+            
+            showAlert('✅ User ' + nama + ' ditambahkan!', 'success');
+            addLog('Tambah user: ' + nama);
+            renderUserList();
+            updateStatusDisplay(adminData);
+            updatePinDisplay(adminData);
+            saveData();
+            
+            // Reset form
+            namaUserInput.value = '';
+            pinUserInput.value = '';
+        }
+
+        function editUser(id) {
+            const user = adminData.users[id];
+            if (!user) return;
+            
+            selectedUserId = id;
+            namaUserInput.value = user.nama;
+            pinUserInput.value = user.pin;
+            
+            // Tampilkan tombol edit/hapus/batal
+            tambahUserBtn.style.display = 'none';
+            editUserBtn.style.display = 'inline-flex';
+            hapusUserBtn.style.display = 'inline-flex';
+            batalEditBtn.style.display = 'inline-flex';
+        }
+
+        function simpanPerubahanUser() {
+            if (!selectedUserId || !adminData.users[selectedUserId]) {
+                showAlert('Pilih user yang akan diedit!', 'danger');
+                return;
+            }
+            
+            const nama = namaUserInput.value.trim();
+            const pin = pinUserInput.value.trim();
+            
+            if (!nama || !pin || pin.length !== 6) {
+                showAlert('Nama dan PIN 6 digit wajib diisi!', 'danger');
+                return;
+            }
+            
+            // Cek PIN duplikat (kecuali user yang sama)
+            const existingUsers = Object.entries(adminData.users);
+            if (existingUsers.some(([uid, u]) => uid !== selectedUserId && u.pin === pin)) {
+                showAlert('PIN sudah digunakan oleh user lain!', 'danger');
+                return;
+            }
+            
+            adminData.users[selectedUserId].nama = nama;
+            adminData.users[selectedUserId].pin = pin;
+            
+            showAlert('✅ User ' + nama + ' diperbarui!', 'success');
+            addLog('Edit user: ' + nama);
+            renderUserList();
+            saveData();
+            
+            resetUserForm();
+        }
+
+        function deleteUser(id) {
+            const user = adminData.users[id];
+            if (!user) return;
+            
+            if (!confirm(`Yakin ingin menghapus user "${user.nama}"?`)) return;
+            
+            delete adminData.users[id];
+            
+            showAlert('🗑️ User ' + user.nama + ' dihapus.', 'danger');
+            addLog('Hapus user: ' + user.nama);
+            renderUserList();
+            updateStatusDisplay(adminData);
+            updatePinDisplay(adminData);
+            saveData();
+            
+            resetUserForm();
+        }
+
+        function resetUserForm() {
+            selectedUserId = null;
+            namaUserInput.value = '';
+            pinUserInput.value = '';
+            
+            tambahUserBtn.style.display = 'inline-flex';
+            editUserBtn.style.display = 'none';
+            hapusUserBtn.style.display = 'none';
+            batalEditBtn.style.display = 'none';
+        }
+
+        // ==========================================
+        // FIREBASE CRUD
+        // ==========================================
+        function saveData() {
+            if (!isConnected) {
+                showAlert('Tidak terhubung ke Firebase!', 'danger');
+                return;
+            }
+            database.ref(ADMIN_PATH).set(adminData).catch((error) => {
+                console.error('Error saving data:', error);
+                showAlert('Gagal menyimpan data: ' + error.message, 'danger');
+            });
+        }
+
+        function loadData() {
+            database.ref(ADMIN_PATH).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    adminData = {
+                        users: data.users || {},
+                        pin: data.pin || null,
+                        pinGenerated: data.pinGenerated || null,
+                        tanggalAktif: data.tanggalAktif || null,
+                        tanggalKadaluarsa: data.tanggalKadaluarsa || null,
+                        durasiHari: data.durasiHari || 30,
+                        log: data.log || []
+                    };
+                    durasiInput.value = adminData.durasiHari || 30;
+                    updateStatusDisplay(adminData);
+                    updatePinDisplay(adminData);
+                    renderUserList();
+                    renderLog();
+                    isConnected = true;
+                    connectionStatus.textContent = '✅ Terhubung';
+                    connectionStatus.style.color = '#4ade80';
+                } else {
+                    adminData = {
+                        users: {},
+                        pin: null,
+                        pinGenerated: null,
+                        tanggalAktif: null,
+                        tanggalKadaluarsa: null,
+                        durasiHari: 30,
+                        log: []
+                    };
+                    durasiInput.value = 30;
+                    updateStatusDisplay(adminData);
+                    updatePinDisplay(adminData);
+                    renderUserList();
+                    renderLog();
+                    isConnected = true;
+                    connectionStatus.textContent = '✅ Terhubung';
+                    connectionStatus.style.color = '#4ade80';
+                }
+            }, (error) => {
+                console.error('Error loading data:', error);
+                isConnected = false;
+                connectionStatus.textContent = '❌ Gagal koneksi';
+                connectionStatus.style.color = '#f87171';
+                showAlert('Gagal memuat data dari Firebase: ' + error.message, 'danger');
+            });
+        }
+
+        // ==========================================
+        // FUNGSI ADMIN (Legacy - Single PIN)
+        // ==========================================
+        function generatePin() {
+            const newPin = generateRandomPin(PIN_LENGTH);
+            adminData.pinGenerated = newPin;
+            updatePinDisplay(adminData);
+            showAlert('PIN baru digenerate: ' + newPin + '. Klik "Aktifkan PIN" untuk mengaktifkan.', 'success');
+            addLog('Generate PIN: ' + newPin);
+            saveData();
+        }
+
+        function aktifkanPin() {
+            if (!adminData.pinGenerated) {
+                showAlert('Generate PIN terlebih dahulu!', 'danger');
+                return;
+            }
+            const pin = adminData.pinGenerated;
+            
+            // Tambahkan sebagai user baru jika belum ada
+            if (!adminData.users) adminData.users = {};
+            
+            const id = 'user_' + Date.now();
+            adminData.users[id] = {
+                nama: 'User ' + (Object.keys(adminData.users).length + 1),
+                pin: pin,
+                tanggalAktif: getTodayISO(),
+                tanggalKadaluarsa: null,
+                status: 'active'
+            };
+            
+            adminData.pin = pin;
+            adminData.tanggalAktif = getTodayISO();
+            const expired = new Date();
+            expired.setDate(expired.getDate() + adminData.durasiHari);
+            adminData.tanggalKadaluarsa = expired.toISOString();
+            adminData.pinGenerated = null;
+            
+            updateStatusDisplay(adminData);
+            updatePinDisplay(adminData);
+            renderUserList();
+            showAlert('✅ PIN ' + pin + ' diaktifkan! Masa aktif ' + adminData.durasiHari + ' hari.', 'success');
+            addLog('PIN diaktifkan: ' + pin + ' (Durasi: ' + adminData.durasiHari + ' hari)');
+            saveData();
+        }
+
+        function setDurasi() {
+            const val = parseInt(durasiInput.value);
+            if (isNaN(val) || val < 1) {
+                showAlert('Masukkan jumlah hari yang valid (minimal 1)!', 'danger');
+                return;
+            }
+            adminData.durasiHari = val;
+            showAlert('Durasi default diubah menjadi ' + val + ' hari.', 'success');
+            addLog('Durasi diubah menjadi ' + val + ' hari');
+            saveData();
+        }
+
+        function nonaktifkan() {
+            if (!confirm('Yakin ingin menonaktifkan semua akses?')) return;
+            
+            adminData.pin = null;
+            adminData.tanggalAktif = null;
+            adminData.tanggalKadaluarsa = null;
+            
+            // Nonaktifkan semua user
+            if (adminData.users) {
+                Object.values(adminData.users).forEach(user => {
+                    user.status = 'inactive';
+                    user.tanggalKadaluarsa = new Date().toISOString();
+                });
+            }
+            
+            updateStatusDisplay(adminData);
+            updatePinDisplay(adminData);
+            renderUserList();
+            showAlert('⛔ Semua akses dinonaktifkan.', 'danger');
+            addLog('Semua akses dinonaktifkan');
+            saveData();
+        }
+
+        function resetAll() {
+            if (!confirm('Yakin ingin mereset semua data admin?\nPIN, user, log, dan semua pengaturan akan dihapus.')) {
+                return;
+            }
+            adminData = {
+                users: {},
+                pin: null,
+                pinGenerated: null,
+                tanggalAktif: null,
+                tanggalKadaluarsa: null,
+                durasiHari: 30,
+                log: []
+            };
+            durasiInput.value = 30;
+            updateStatusDisplay(adminData);
+            updatePinDisplay(adminData);
+            renderUserList();
+            renderLog();
+            resetUserForm();
+            showAlert('🔄 Semua data admin telah direset.', 'warning');
+            saveData();
+        }
+
+        function toggleLog() {
+            if (logContainer.style.display === 'none') {
+                logContainer.style.display = 'block';
+                renderLog();
+                lihatLogBtn.textContent = '📋 Tutup Log';
+            } else {
+                logContainer.style.display = 'none';
+                lihatLogBtn.textContent = '📋 Lihat Log';
+            }
+        }
+
+        // ==========================================
+        // VALIDASI PIN (Untuk index.html)
+        // ==========================================
+        window.validatePin = function(inputPin) {
+            // Cek multiple users dulu
+            if (adminData.users && Object.keys(adminData.users).length > 0) {
+                for (const [id, user] of Object.entries(adminData.users)) {
+                    if (user.pin === inputPin && user.status === 'active') {
+                        // Cek kadaluarsa
+                        if (user.tanggalKadaluarsa) {
+                            const now = new Date();
+                            const expired = new Date(user.tanggalKadaluarsa);
+                            if (now > expired) {
+                                return { valid: false, message: 'Langganan ' + user.nama + ' telah kadaluarsa.' };
+                            }
+                        }
+                        return { 
+                            valid: true, 
+                            message: 'Akses diterima!',
+                            user: { id: id, nama: user.nama }
+                        };
+                    }
+                }
+                return { valid: false, message: 'PIN salah atau user tidak aktif!' };
+            }
+            
+            // Fallback ke single PIN (legacy)
+            if (!adminData.pin) return { valid: false, message: 'Sistem belum aktif. Hubungi admin.' };
+            if (adminData.tanggalKadaluarsa) {
+                const now = new Date();
+                const expired = new Date(adminData.tanggalKadaluarsa);
+                if (now > expired) {
+                    return { valid: false, message: 'Langganan telah kadaluarsa. Hubungi admin untuk perpanjang.' };
+                }
+            }
+            if (inputPin === adminData.pin) {
+                return { valid: true, message: 'Akses diterima!' };
+            }
+            return { valid: false, message: 'PIN salah!' };
+        };
+
+        window.getAksesStatus = function() {
+            // Cek multiple users
+            if (adminData.users && Object.keys(adminData.users).length > 0) {
+                const activeUsers = Object.values(adminData.users).filter(u => {
+                    if (u.status !== 'active') return false;
+                    if (!u.tanggalKadaluarsa) return true;
+                    return new Date() < new Date(u.tanggalKadaluarsa);
+                });
+                return { 
+                    aktif: activeUsers.length > 0, 
+                    message: activeUsers.length + ' user aktif',
+                    users: activeUsers
+                };
+            }
+            
+            // Fallback ke single PIN (legacy)
+            if (!adminData.pin) {
+                return { aktif: false, message: 'Sistem belum aktif' };
+            }
+            if (adminData.tanggalKadaluarsa) {
+                const now = new Date();
+                const expired = new Date(adminData.tanggalKadaluarsa);
+                if (now > expired) {
+                    return { aktif: false, message: 'Langganan kadaluarsa', kadaluarsa: adminData.tanggalKadaluarsa };
+                }
+                const diff = Math.ceil((expired - now) / (1000 * 60 * 60 * 24));
+                return { aktif: true, message: 'Aktif', sisaHari: diff, kadaluarsa: adminData.tanggalKadaluarsa };
+            }
+            return { aktif: true, message: 'Aktif (tanpa batas)' };
+        };
+
+        // ==========================================
+        // CEK KONEKSI FIREBASE
+        // ==========================================
+        database.ref('.info/connected').on('value', (snap) => {
+            if (snap.val() === true) {
+                console.log('✅ Admin: Terhubung ke Firebase');
+            } else {
+                console.log('❌ Admin: Tidak terhubung ke Firebase');
+            }
+        });
+
+        // ==========================================
+        // INIT
+        // ==========================================
+        function init() {
+            loadData();
+
+            // User management events
+            tambahUserBtn.addEventListener('click', tambahUser);
+            editUserBtn.addEventListener('click', simpanPerubahanUser);
+            hapusUserBtn.addEventListener('click', () => {
+                if (selectedUserId) deleteUser(selectedUserId);
+            });
+            batalEditBtn.addEventListener('click', resetUserForm);
+
+            // Legacy events
+            generatePinBtn.addEventListener('click', generatePin);
+            aktifkanPinBtn.addEventListener('click', aktifkanPin);
+            setDurasiBtn.addEventListener('click', setDurasi);
+            nonaktifkanBtn.addEventListener('click', nonaktifkan);
+            resetAllBtn.addEventListener('click', resetAll);
+            lihatLogBtn.addEventListener('click', toggleLog);
+            tutupLogBtn.addEventListener('click', toggleLog);
+
+            durasiInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') setDurasi();
+            });
+        }
+
+        init();
+    </script>
+</body>
+  </html>

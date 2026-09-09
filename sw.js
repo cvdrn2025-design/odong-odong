@@ -2,7 +2,7 @@
 // SERVICE WORKER - Odong-Odong PWA
 // ============================================
 
-const CACHE_NAME = 'odong-odong-v1.0.1';
+const CACHE_NAME = 'odong-odong-v1.0.2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -56,7 +56,7 @@ self.addEventListener('activate', (event) => {
 });
 
 // ============================================
-// FETCH EVENT
+// FETCH EVENT - Serve from cache or network
 // ============================================
 self.addEventListener('fetch', (event) => {
   const request = event.request;
@@ -68,7 +68,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // HTML pages - Network first
+  // HTML pages - Network first, fallback to cache
   if (request.headers.get('accept')?.includes('text/html')) {
     event.respondWith(
       fetch(request)
@@ -90,7 +90,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Assets - Cache first
+  // Assets - Cache first, fallback to network
   if (request.url.match(/\.(css|js|json|png|jpg|jpeg|svg|webp|ico)$/)) {
     event.respondWith(
       caches.match(request)
@@ -113,7 +113,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Default
+  // Default - Network first
   event.respondWith(
     fetch(request)
       .catch(() => {
@@ -126,33 +126,18 @@ self.addEventListener('fetch', (event) => {
 // PUSH NOTIFICATION
 // ============================================
 self.addEventListener('push', (event) => {
-  let data = {
-    title: 'Odong-Odong',
-    body: 'Ada pembaruan!',
-    icon: '/icon-192.png',
-    badge: '/icon-192.png'
-  };
-
-  if (event.data) {
-    try {
-      data = event.data.json();
-    } catch (e) {
-      data.body = event.data.text();
-    }
-  }
-
   const options = {
-    body: data.body,
-    icon: data.icon || '/icon-192.png',
-    badge: data.badge || '/icon-192.png',
+    body: event.data ? event.data.text() : 'Ada pembaruan!',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
     vibrate: [200, 100, 200],
     data: {
-      url: data.url || '/'
+      url: '/'
     }
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Odong-Odong', options)
+    self.registration.showNotification('Odong-Odong', options)
   );
 });
 
@@ -180,4 +165,4 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
-console.log('[SW] Service Worker loaded');
+console.log('[SW] Service Worker loaded for Odong-Odong PWA');

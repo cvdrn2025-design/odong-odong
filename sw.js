@@ -2,14 +2,16 @@
 // SERVICE WORKER - Odong-Odong PWA
 // ============================================
 
-const CACHE_NAME = 'odong-odong-v1.0.2';
+const CACHE_NAME = 'odong-odong-v1.0.3';
+const BASE_URL = 'https://cvdrn2025-design.github.io/odong-odong';
+
 const ASSETS_TO_CACHE = [
-  '/odong-odong/',
-  '/odong-odong/index.html',
-  '/odong-odong/admin.html',
-  '/odong-odong/manifest.json',
-  '/odong-odong/icon-192.png',
-  '/odong-odong/icon-512.png'
+  BASE_URL + '/',
+  BASE_URL + '/index.html',
+  BASE_URL + '/admin.html',
+  BASE_URL + '/manifest.json',
+  BASE_URL + '/icon-192.png',
+  BASE_URL + '/icon-512.png'
 ];
 
 // ============================================
@@ -83,7 +85,7 @@ self.addEventListener('fetch', (event) => {
           return caches.match(request)
             .then((cachedResponse) => {
               if (cachedResponse) return cachedResponse;
-              return caches.match('/odong-odong/index.html');
+              return caches.match(BASE_URL + '/index.html');
             });
         })
     );
@@ -128,11 +130,11 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('push', (event) => {
   const options = {
     body: event.data ? event.data.text() : 'Ada pembaruan!',
-    icon: '/odong-odong/icon-192.png',
-    badge: '/odong-odong/icon-192.png',
+    icon: BASE_URL + '/icon-192.png',
+    badge: BASE_URL + '/icon-192.png',
     vibrate: [200, 100, 200],
     data: {
-      url: '/odong-odong/'
+      url: BASE_URL + '/'
     }
   };
 
@@ -146,7 +148,7 @@ self.addEventListener('push', (event) => {
 // ============================================
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const urlToOpen = event.notification.data?.url || '/odong-odong/';
+  const urlToOpen = event.notification.data?.url || BASE_URL + '/';
 
   event.waitUntil(
     self.clients.matchAll({

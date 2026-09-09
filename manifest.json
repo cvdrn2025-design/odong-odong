@@ -7,6 +7,10 @@
   "orientation": "portrait",
   "background_color": "#0f172a",
   "theme_color": "#facc15",
+  "id": "/",
+  "lang": "id",
+  "dir": "ltr",
+  "scope": "/",
   "icons": [
     {
       "src": "icon-192.png",
@@ -19,6 +23,31 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Admin Panel",
+      "short_name": "Admin",
+      "description": "Kelola akses dan langganan",
+      "url": "/admin.html",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "categories": ["business", "utilities"],
+  "screenshots": [
+    {
+      "src": "screenshot.png",
+      "sizes": "360x640",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Halaman Utama Odong-Odong"
     }
   ]
 }
